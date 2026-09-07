@@ -1,0 +1,54 @@
+name: بناء تطبيق سوق البرامون
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: تحميل المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: تثبيت الحزم
+        run: npm install
+
+      - name: تثبيت Capacitor
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: بناء المشروع
+        run: npm run build
+
+      - name: إنشاء تطبيق Android
+        run: |
+          npx cap init "سوق البرامون" "com.souqelbaramoun.app" --web-dir dist
+          npx cap add android
+          npx cap copy android
+
+      - name: إعداد Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: بناء APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: حفظ APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: سوق-البرامون
+          path: android/app/build/outputs/apk/debug/app-debug.apk
