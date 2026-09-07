@@ -7,9 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
       - name: تحميل المشروع
         uses: actions/checkout@v4
@@ -18,10 +15,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          - name: إعداد Node.js
-  uses: actions/setup-node@v4
-  with:
-    node-version: 20
+
       - name: تثبيت الحزم
         run: npm install
 
@@ -31,7 +25,7 @@ jobs:
       - name: بناء المشروع
         run: npm run build
 
-      - name: إنشاء تطبيق Android
+      - name: إنشاء Android
         run: |
           npx cap init "سوق البرامون" "com.souqelbaramoun.app" --web-dir dist
           npx cap add android
@@ -52,5 +46,5 @@ jobs:
       - name: حفظ APK
         uses: actions/upload-artifact@v4
         with:
-          name: سوق-البرامون
+          name: سوق-البرامون-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
