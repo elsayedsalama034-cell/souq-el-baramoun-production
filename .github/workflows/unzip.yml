@@ -1,15 +1,12 @@
 name: فك ضغط المشروع
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - "souq-el-baramoun-production-v34.zip"
+  workflow_dispatch:
 
 jobs:
   unzip:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
@@ -19,19 +16,19 @@ jobs:
 
       - name: فك الضغط
         run: |
-          mkdir -p project
-          unzip -o "souq-el-baramoun-production-v34.zip" -d project
+          if [ -f "souq-el-baramoun-production-v34.zip" ]; then
+            unzip -o "souq-el-baramoun-production-v34.zip" -d extracted
+            cp -r extracted/* .
+            rm -rf extracted
+            rm -f "souq-el-baramoun-production-v34.zip"
+          else
+            echo "لا يوجد ملف ZIP"
+          fi
 
-      - name: رفع الملفات للمستودع
-        run: |
-          cp -r project/* .
-          rm -rf project
-          rm -f "souq-el-baramoun-production-v34.zip"
-
-      - name: حفظ التغييرات
+      - name: حفظ الملفات
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "فك ضغط المشروع ورفع الملفات" || exit 0
+          git commit -m "فك ضغط المشروع" || true
           git push
